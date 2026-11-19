@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>ClothingPairingOnline</AssemblyName>
+    <RootNamespace>ClothingPairing.Online</RootNamespace>
+    <Version>1.2.1</Version>
+    <AssemblyVersion>1.2.1.0</AssemblyVersion>
+    <Authors>Displaced</Authors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Modules\ClothingPairingOnline.cs" />
+    <Reference Include="Dalamud" HintPath="$(DalamudDir)\Dalamud.dll" Private="false" />
+    <Reference Include="Dalamud.Bindings.ImGui" HintPath="$(DalamudDir)\Dalamud.Bindings.ImGui.dll" Private="false" />
+    <Reference Include="FFXIVClientStructs" HintPath="$(DalamudDir)\FFXIVClientStructs.dll" Private="false" />
+    <Reference Include="InteropGenerator.Runtime" HintPath="$(DalamudDir)\InteropGenerator.Runtime.dll" Private="false" />
+    <Reference Include="Lumina" HintPath="$(DalamudDir)\Lumina.dll" Private="false" />
+    <Reference Include="Lumina.Excel" HintPath="$(DalamudDir)\Lumina.Excel.dll" Private="false" />
+    <Reference Include="OmniToolbox.Common" HintPath="$(OmniDir)\OmniToolbox.Common.dll" Private="false" />
+    <Reference Include="TreeTools" HintPath="$(OmniDir)\TreeTools.dll" Private="false" />
+  </ItemGroup>
+</Project>

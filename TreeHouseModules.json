@@ -1,0 +1,21 @@
+{
+  "SchemaVersion": 1,
+  "Modules": [
+    {
+      "InternalName": "ClothingPairingOnline",
+      "Author": "Displaced",
+      "RepositoryURL": "https://github.com/Displaced5/OmniToolbox.Displaced",
+      "Version": "1.2.1",
+      "ApiVersion": 1,
+      "MinimumOmniVersion": "1.2.0.6",
+      "File": "Modules/ClothingPairingOnline.cs",
+      "Sha256": "E235B8259F49DA916490A56CBF67FA1C709DD358FEDCFEF1D9E1D21AE2782346",
+      "Localization": {
+        "Source": {
+          "Title": "Clothing pairing",
+          "Description": "分别记忆一件时尚配饰和面部配饰，在出本或职业、套装切换造成缺失后恢复。"
+        }
+      }
+    }
+  ]
+}
