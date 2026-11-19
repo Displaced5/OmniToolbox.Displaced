@@ -1,5 +1,11 @@
 # 更新记录
 
+## 自动装配面部、时尚配饰 1.2.2
+
+- Omni 模块显示名称改为“自动装配面部、时尚配饰”。
+- 同步模块简繁词库、在线清单及安装说明，内部名、命令和记忆路径保持一致。
+- 独立 Dalamud 插件仍名为 Clothing pairing，本次不修改独立版。
+
 ## Clothing pairing 1.2.1
 
 - Omni 在线版独立发布到 `Displaced5/OmniToolbox.Displaced`。

@@ -101,7 +101,7 @@ var repositoryUrl = module.GetProperty("RepositoryURL").GetString();
 var supportUrls = (IEnumerable<string>)info.GetType().GetProperty("SupportUrls")!.GetValue(info)!;
 Check(repositoryUrl == "https://github.com/Displaced5/OmniToolbox.Displaced" && supportUrls.Contains(repositoryUrl),
     "manifest and module support URL use the dedicated online repository");
-Check(module.GetProperty("Version").GetString() == "1.2.1" && assembly.GetName().Version == new Version(1, 2, 1, 0),
+Check(module.GetProperty("Version").GetString() == "1.2.2" && assembly.GetName().Version == new Version(1, 2, 2, 0),
     "published version matches compiled online module");
 var sourcePath = Path.Combine(sourceRoot, module.GetProperty("File").GetString()!);
 Check(Path.GetFileNameWithoutExtension(sourcePath) == type.Name, "module filename matches type name");

@@ -842,7 +842,7 @@ internal static class OnlineTexts
 {
     public static IReadOnlyDictionary<string, string> Source { get; } = new Dictionary<string, string>
     {
-        ["Title"] = "Clothing pairing",
+        ["Title"] = "自动装配面部、时尚配饰",
         ["Description"] = "分别记忆一件时尚配饰和面部配饰，在出本或职业、套装切换造成缺失后恢复。",
         ["CommandPause"] = "暂停两类配饰的自动恢复",
         ["CommandRestore"] = "请求恢复已记忆的两类配饰",

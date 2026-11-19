@@ -1,6 +1,8 @@
 # OmniToolbox.Displaced
 
-Displaced 的 Omni 在线模块仓库，当前提供 **Clothing pairing 1.2.1**。
+Displaced 的 Omni 在线模块仓库，当前提供 **自动装配面部、时尚配饰 1.2.2**。
+
+此名称仅用于 Omni 在线模块；独立 Dalamud 插件仍为 **Clothing pairing**。
 
 分别记忆一件时尚配饰和一件面部配饰，保存面部款式及颜色。沿用 B 方案：出本后恢复，面部配饰在切换职业、套装造成缺失后恢复；手动摘除后暂停，当前佩戴选择优先。
 
@@ -14,7 +16,7 @@ Displaced 的 Omni 在线模块仓库，当前提供 **Clothing pairing 1.2.1**�
 https://github.com/Displaced5/OmniToolbox.Displaced
 ```
 
-刷新并安装 **Clothing pairing**，然后在“树树妙妙屋 → 在线”手动启用。先关闭独立版 Clothing pairing，首次使用手动佩戴一次希望记录的配饰。
+刷新并安装 **自动装配面部、时尚配饰**，然后在“树树妙妙屋 → 在线”手动启用。先关闭独立版 Clothing pairing，首次使用手动佩戴一次希望记录的配饰。
 
 如果已使用旧仓库中的同名在线模块，请在 Omni 中改用本仓库，避免同时保留两个来源。模块内部名 `ClothingPairingOnline`、命令和记忆路径保持一致。
 
@@ -47,7 +49,7 @@ https://github.com/Displaced5/OmniToolbox.Displaced
   插件/
     OmniToolbox.Displaced/
       .build/                  编译中间文件
-      1.2.1/                   交付副本和本地核验记录
+      1.2.2/                   交付副本和本地核验记录
 ```
 
 安装 .NET SDK 10，使用匹配的 Dalamud 与 Omni 程序集：
