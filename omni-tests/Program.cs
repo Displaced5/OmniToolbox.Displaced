@@ -101,7 +101,7 @@ var repositoryUrl = module.GetProperty("RepositoryURL").GetString();
 var supportUrls = (IEnumerable<string>)info.GetType().GetProperty("SupportUrls")!.GetValue(info)!;
 Check(repositoryUrl == "https://github.com/Displaced5/OmniToolbox.Displaced" && supportUrls.Contains(repositoryUrl),
     "manifest and module support URL use the dedicated online repository");
-Check(module.GetProperty("Version").GetString() == "1.2.2" && assembly.GetName().Version == new Version(1, 2, 2, 0),
+Check(module.GetProperty("Version").GetString() == "1.2.3" && assembly.GetName().Version == new Version(1, 2, 3, 0),
     "published version matches compiled online module");
 var sourcePath = Path.Combine(sourceRoot, module.GetProperty("File").GetString()!);
 Check(Path.GetFileNameWithoutExtension(sourcePath) == type.Name, "module filename matches type name");
@@ -110,4 +110,5 @@ Check(Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(sourcePath))) == mod
 Check(module.GetProperty("Localization").GetProperty("Source").GetProperty("Title").GetString() == source["Title"] &&
     module.GetProperty("Localization").GetProperty("Source").GetProperty("Description").GetString() == source["Description"],
     "manifest localized title and description match module source");
+await LifecycleChecks.RunAsync(assembly, common, dalamudDirectory, Check);
 Console.WriteLine($"{passed} Omni integration checks passed.");

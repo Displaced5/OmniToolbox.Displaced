@@ -516,6 +516,28 @@ Test("online archive reloaded memories do not arm automatic restoration", () => 
     No(Tick(controller, 5, options: loaded.ToOptions(AccessoryKind.Facewear))); Check(!controller.HasPendingRequest);
 }));
 
+Test("async archive loading preserves complete facewear variant without changing host preferences", () => WithArchive(path =>
+{
+    var settings = new SettingsData { Enabled = false };
+    settings.GetMemory(101, AccessoryKind.Facewear).LastAccessoryId = 177;
+    MemoryArchive.Save(path, settings);
+    var loaded = MemoryArchive.ReadAsync(path, CancellationToken.None).GetAwaiter().GetResult()!;
+    Check(loaded.GetMemory(101, AccessoryKind.Facewear).LastAccessoryId == 177 && loaded.Enabled);
+}));
+Test("async archive missing file retains absence instead of creating empty replacement memories", () => WithArchive(path =>
+{
+    Check(MemoryArchive.ReadAsync(path, CancellationToken.None).GetAwaiter().GetResult() is null);
+    Check(!File.Exists(path));
+}));
+Test("async archive cancelled startup leaves the original memory file untouched", () => WithArchive(path =>
+{
+    File.WriteAllText(path, "synthetic original");
+    using var cancellation = new CancellationTokenSource(); cancellation.Cancel();
+    var cancelled = false;
+    try { MemoryArchive.ReadAsync(path, cancellation.Token).GetAwaiter().GetResult(); }
+    catch (OperationCanceledException) { cancelled = true; }
+    Check(cancelled && File.ReadAllText(path) == "synthetic original");
+}));
 Console.WriteLine($"{passed} passed; {failures.Count} failed.");
 foreach (var failure in failures) Console.Error.WriteLine(failure);
 return failures.Count == 0 ? 0 : 1;

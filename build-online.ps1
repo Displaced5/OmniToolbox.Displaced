@@ -42,7 +42,7 @@ $manifest = [ordered]@{
     Modules = @([ordered]@{
         InternalName='ClothingPairingOnline'; Author='Displaced'
         RepositoryURL='https://github.com/Displaced5/OmniToolbox.Displaced'
-        Version='1.2.2'; ApiVersion=1; MinimumOmniVersion='1.2.0.6'
+        Version='1.2.3'; ApiVersion=1; MinimumOmniVersion='1.2.0.6'
         File='Modules/ClothingPairingOnline.cs'; Sha256=$moduleHash
         Localization=[ordered]@{Source=[ordered]@{Title='自动装配面部、时尚配饰';Description='分别记忆一件时尚配饰和面部配饰，在出本或职业、套装切换造成缺失后恢复。'}}
     })
@@ -61,12 +61,12 @@ $coreChecks | ForEach-Object { Write-Host $_ }
 $onlineChecks = & $DotnetPath (Join-Path $binaries 'ClothingPairing.OnlineChecks\Release\net10.0-windows\ClothingPairing.OnlineChecks.dll') (Join-Path $binaries 'ClothingPairingOnline\Release\net10.0-windows\ClothingPairingOnline.dll') $OmniDir $DalamudDir $sourceRoot
 if ($LASTEXITCODE) { throw 'Omni 真实契约检查失败' }
 $onlineChecks | ForEach-Object { Write-Host $_ }
-$onlineOutput = Join-Path $outputRoot '1.2.2'
+$onlineOutput = Join-Path $outputRoot '1.2.3'
 [void][IO.Directory]::CreateDirectory($onlineOutput)
 Copy-Item -LiteralPath $modulePath -Destination $onlineOutput -Force
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'TreeHouseModules.json') -Destination $onlineOutput -Force
 $record = [ordered]@{
-    version='1.2.2'; api=1; minimum_omni='1.2.0.6'; source_sha256=$moduleHash
+    version='1.2.3'; api=1; minimum_omni='1.2.0.6'; source_sha256=$moduleHash
     build='0 warnings, 0 errors'; core_checks=@($coreChecks); omni_checks=@($onlineChecks)
     host_assemblies=@(foreach ($name in @('OmniToolbox.Common.dll','TreeTools.dll')) {
         $file = Get-Item -LiteralPath (Join-Path $OmniDir $name)
@@ -74,6 +74,6 @@ $record = [ordered]@{
     })
     in_game_verified=$false; installed=$false
 }
-$record | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $onlineOutput '验证记录-1.2.2.json') -Encoding utf8
+$record | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $onlineOutput '验证记录-1.2.3.json') -Encoding utf8
 Write-Host "Omni 在线源文件：$modulePath"
 Write-Host "SHA256：$moduleHash"

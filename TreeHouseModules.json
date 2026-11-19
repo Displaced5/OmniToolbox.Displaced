@@ -5,11 +5,11 @@
       "InternalName": "ClothingPairingOnline",
       "Author": "Displaced",
       "RepositoryURL": "https://github.com/Displaced5/OmniToolbox.Displaced",
-      "Version": "1.2.2",
+      "Version": "1.2.3",
       "ApiVersion": 1,
       "MinimumOmniVersion": "1.2.0.6",
       "File": "Modules/ClothingPairingOnline.cs",
-      "Sha256": "CF93B61297CFEF0E3ABAAE41D68B977B43715FA400B69FE7AE834C0B5A2CF682",
+      "Sha256": "2B998CD73D0F00E76FF0543C653AA70512D4D15A4A7957726F4FE853EF0DC278",
       "Localization": {
         "Source": {
           "Title": "自动装配面部、时尚配饰",

@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ClothingPairing.Core;
 
@@ -12,7 +14,23 @@ public sealed class MemoryArchive
     public static void Load(string path, SettingsData settings)
     {
         if (!File.Exists(path)) return;
-        var archive = JsonSerializer.Deserialize<MemoryArchive>(File.ReadAllText(path))
+        var normalized = Parse(File.ReadAllText(path));
+        settings.Characters = normalized.Characters;
+        settings.FacewearCharacters = normalized.FacewearCharacters;
+    }
+
+    public static async Task<SettingsData?> ReadAsync(string path, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!File.Exists(path)) return null;
+        var json = await File.ReadAllTextAsync(path, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        return Parse(json);
+    }
+
+    private static SettingsData Parse(string json)
+    {
+        var archive = JsonSerializer.Deserialize<MemoryArchive>(json)
             ?? throw new InvalidDataException("Empty accessory memory file.");
         var normalized = new SettingsData
         {
@@ -21,8 +39,7 @@ public sealed class MemoryArchive
             FacewearCharacters = archive.FacewearCharacters,
         };
         normalized.Normalize();
-        settings.Characters = normalized.Characters;
-        settings.FacewearCharacters = normalized.FacewearCharacters;
+        return normalized;
     }
 
     public static void Save(string path, SettingsData settings)

@@ -22,6 +22,7 @@ internal static class OnlineTexts
         ["StandaloneConflict"] = "检测到独立版 Clothing pairing 已加载；在线模块暂停执行。请关闭独立版后使用本模块。",
         ["SaveError"] = "配饰记忆保存失败，当前会话仍有效；请查看 /xllog。",
         ["DisabledModule"] = "模块尚未启用，启用后开始记录配饰。",
+        ["Starting"] = "正在初始化配饰服务与记忆，请稍候。",
         ["Fashion"] = "时尚配饰",
         ["Facewear"] = "面部配饰",
         ["Synchronizing"] = "状态同步中",

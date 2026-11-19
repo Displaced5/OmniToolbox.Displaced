@@ -2,4 +2,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dalamud" HintPath="$(DalamudDir)\Dalamud.dll" Private="false" />
+    <Reference Include="Lumina" HintPath="$(DalamudDir)\Lumina.dll" Private="false" />
+  </ItemGroup>
 </Project>

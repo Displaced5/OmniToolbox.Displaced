@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using ClothingPairing.Core;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Plugin.Services;
@@ -48,6 +50,7 @@ public sealed class ClothingPairingOnline : OmniModuleBase
     private double nextSample;
     private double nextSave;
     private bool active;
+    private bool starting;
     private bool dirty;
     private bool persistenceFault;
     private bool standalonePresent;
@@ -63,30 +66,62 @@ public sealed class ClothingPairingOnline : OmniModuleBase
         nextSample = nextSave = 0;
         dirty = persistenceFault = standalonePresent = false;
         clearTarget = null;
+        clearCharacter = null;
+        active = false;
+        starting = true;
         memoryPath = Path.Combine(DalamudServices.PluginInterface.GetPluginConfigDirectory(),
             "ClothingPairingOnline", "memories.json");
-        MemoryArchive.Load(memoryPath, config);
-        services = DalamudServices.PluginInterface.Create<ModuleServices>()
-            ?? throw new InvalidOperationException("Accessory services are unavailable.");
-        adapter = new GameAdapter(services.Client, services.Player, services.Objects,
-            services.Conditions, services.Unlocks, services.Data);
         clock.Restart();
-        active = true;
-        activation.OnStopping(() =>
+        activation.OnStopping(StopInput);
+        activation.TrackStartup(InitializeAsync(activation));
+        DalamudServices.PluginLog.Information("Accessory module startup requested");
+    }
+
+    private async Task InitializeAsync(FeatureLifetime activation)
+    {
+        var cancellationToken = activation.CancellationToken;
+        var framework = DalamudServices.Framework;
+        // Create<T> synchronously waits for a continuation on this same framework scheduler.
+        var currentServices = await DalamudServices.PluginInterface.CreateAsync<ModuleServices>().ConfigureAwait(false)
+            ?? throw new InvalidOperationException("Accessory services are unavailable.");
+        cancellationToken.ThrowIfCancellationRequested();
+        var memories = await MemoryArchive.ReadAsync(memoryPath, cancellationToken).ConfigureAwait(false);
+        await framework.RunOnFrameworkThread(() =>
         {
-            active = false;
-            DalamudServices.Framework.Update -= OnUpdate;
-            services.Client.TerritoryChanged -= OnTerritoryChanged;
-            services.Client.Logout -= OnLogout;
-        });
-        DalamudServices.Framework.Update += OnUpdate;
-        services.Client.TerritoryChanged += OnTerritoryChanged;
-        services.Client.Logout += OnLogout;
+            cancellationToken.ThrowIfCancellationRequested();
+            if (activation.IsStopping) throw new OperationCanceledException(cancellationToken);
+            var currentAdapter = new GameAdapter(currentServices.Client, currentServices.Player, currentServices.Objects,
+                currentServices.Conditions, currentServices.Unlocks, currentServices.Data);
+            if (memories is not null)
+            {
+                config.Characters = memories.Characters;
+                config.FacewearCharacters = memories.FacewearCharacters;
+            }
+            services = currentServices;
+            adapter = currentAdapter;
+            // Capture this activation's services; the host owns their lifetime.
+            activation.OnStopping(() => framework.Update -= OnUpdate);
+            activation.OnStopping(() => currentServices.Client.TerritoryChanged -= OnTerritoryChanged);
+            activation.OnStopping(() => currentServices.Client.Logout -= OnLogout);
+            framework.Update += OnUpdate;
+            currentServices.Client.TerritoryChanged += OnTerritoryChanged;
+            currentServices.Client.Logout += OnLogout;
+            starting = false;
+            active = true;
+            DalamudServices.PluginLog.Information("Accessory module startup completed");
+        }).ConfigureAwait(false);
+    }
+
+    private void StopInput()
+    {
+        active = false;
+        starting = false;
+        while (actions.TryDequeue(out _)) { }
     }
 
     protected override void OnStop()
     {
-        active = false;
+        StopInput();
         FlushMemories(true);
         ResetObservation();
         adapter = null;
@@ -94,6 +129,7 @@ public sealed class ClothingPairingOnline : OmniModuleBase
         clearTarget = null;
         clearCharacter = null;
         clock.Stop();
+        DalamudServices.PluginLog.Information("Accessory module stopped");
     }
 
     private static AccessoryKind Kind(int index) => index == 0 ? AccessoryKind.Fashion : AccessoryKind.Facewear;
@@ -107,18 +143,24 @@ public sealed class ClothingPairingOnline : OmniModuleBase
         adapter?.ResetSession();
     }
 
-    private void OnTerritoryChanged(uint territory) =>
-        actions.Enqueue(() => adapter?.NotifyZoneChange(clock.Elapsed.TotalSeconds));
-
-    private void OnLogout(int type, int code) => actions.Enqueue(() =>
+    private void OnTerritoryChanged(uint territory)
     {
-        FlushMemories(true);
-        ResetObservation();
-    });
+        if (active && IsEnabled) actions.Enqueue(() => adapter?.NotifyZoneChange(clock.Elapsed.TotalSeconds));
+    }
+
+    private void OnLogout(int type, int code)
+    {
+        if (!active || !IsEnabled) return;
+        actions.Enqueue(() =>
+        {
+            FlushMemories(true);
+            ResetObservation();
+        });
+    }
 
     private void OnUpdate(IFramework framework)
     {
-        if (!active || adapter is null) return;
+        if (!active || !IsEnabled || adapter is null) return;
         try
         {
             var conflict = DalamudServices.PluginInterface.InstalledPlugins.Any(p =>
@@ -210,7 +252,7 @@ public sealed class ClothingPairingOnline : OmniModuleBase
 
     public override bool TryHandleCommand(string arguments)
     {
-        if (!active || standalonePresent) return false;
+        if (!active || !IsEnabled || standalonePresent) return false;
         var parts = arguments.Trim().ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var category = parts.FirstOrDefault();
         var command = category is "face" or "fashion" ? parts.ElementAtOrDefault(1) : category;
@@ -254,7 +296,7 @@ public sealed class ClothingPairingOnline : OmniModuleBase
         changed |= Check("Umbrella", config.RespectAutoUmbrella, v => config.RespectAutoUmbrella = v);
         if (standalonePresent) ImGui.TextWrapped(L("StandaloneConflict"));
         if (persistenceFault) ImGui.TextWrapped(L("SaveError"));
-        if (!active) ImGui.TextWrapped(L("DisabledModule"));
+        if (!active) ImGui.TextWrapped(L(starting ? "Starting" : "DisabledModule"));
         for (var i = 0; i < controllers.Length; i++) DrawChannel(i);
         return changed;
     }
@@ -273,7 +315,7 @@ public sealed class ClothingPairingOnline : OmniModuleBase
             controllers[index] is { } controller ? State(controller.Status) : L("WaitingForPlayer")));
         if (controllers[index] is { } current)
             ImGui.TextUnformatted(string.Format(L("Attempts"), current.Attempts, RestoreController.MaximumAttempts));
-        ImGui.BeginDisabled(!active || standalonePresent || failed[index] || controllers[index] is null);
+        ImGui.BeginDisabled(!active || !IsEnabled || standalonePresent || failed[index] || controllers[index] is null);
         if (OmniControls.SmallButton(L("Pause"), false)) Queue(index, c => c.Pause());
         ImGui.SameLine();
         ImGui.BeginDisabled(!config.ToOptions(Kind(index)).Enabled);

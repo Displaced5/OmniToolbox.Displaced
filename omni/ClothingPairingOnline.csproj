@@ -2,8 +2,8 @@
   <PropertyGroup>
     <AssemblyName>ClothingPairingOnline</AssemblyName>
     <RootNamespace>ClothingPairing.Online</RootNamespace>
-    <Version>1.2.2</Version>
-    <AssemblyVersion>1.2.2.0</AssemblyVersion>
+    <Version>1.2.3</Version>
+    <AssemblyVersion>1.2.3.0</AssemblyVersion>
     <Authors>Displaced</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
